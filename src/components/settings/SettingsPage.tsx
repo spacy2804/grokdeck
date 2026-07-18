@@ -488,8 +488,8 @@ function AboutSection() {
       <div className="settings-section">
         <div className="settings-section-title">Links</div>
         {[
-          { label: 'Grok Build repository', url: 'https://github.com/xai-org/grok-build' },
-          { label: 'Report an issue', url: 'https://github.com/xai-org/grok-build/issues' },
+          { label: 'Grok Deck repository', url: 'https://github.com/spacy2804/grokdeck' },
+          { label: 'Report an issue', url: 'https://github.com/spacy2804/grokdeck/issues' },
         ].map((link) => (
           <a
             key={link.url}

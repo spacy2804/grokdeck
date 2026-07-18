@@ -81,24 +81,42 @@ pub async fn cmd_install_grok_cli(
     app_handle: AppHandle,
     state: State<'_, AppState>,
 ) -> Result<String, String> {
-    // Verify that curl is available
-    which::which("curl").map_err(|_| {
-        "curl is required but not found. Please install curl and try again.".to_string()
-    })?;
+    let (cmd_program, cmd_args) = if cfg!(target_os = "windows") {
+        (
+            "powershell".to_string(),
+            vec![
+                "-NoProfile".to_string(),
+                "-ExecutionPolicy".to_string(),
+                "Bypass".to_string(),
+                "-Command".to_string(),
+                "irm https://x.ai/cli/install.ps1 | iex".to_string(),
+            ],
+        )
+    } else {
+        // Verify that curl is available on Unix
+        which::which("curl").map_err(|_| {
+            "curl is required but not found. Please install curl and try again.".to_string()
+        })?;
+        (
+            "bash".to_string(),
+            vec![
+                "-c".to_string(),
+                format!("curl -fsSL '{INSTALL_SCRIPT_URL}' | bash"),
+            ],
+        )
+    };
 
     emit_progress(&app_handle, "downloading", 0, 0, 0, "Running official Grok CLI installer…");
 
-    // Run: bash -c "curl -fsSL <url> | bash"
-    // We capture stdout + stderr line-by-line and forward as progress events.
-    let mut child = tokio::process::Command::new("bash")
-        .arg("-c")
-        .arg(format!("curl -fsSL '{INSTALL_SCRIPT_URL}' | bash"))
+    // Run the installer command, capture stdout + stderr line-by-line
+    let mut child = tokio::process::Command::new(cmd_program)
+        .args(cmd_args)
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .spawn()
         .map_err(|e| format!("Failed to start installer: {e}"))?;
 
-    // Stream stderr (install.sh writes progress to stderr)
+    // Stream stderr (installer writes progress to stderr)
     let stderr = child
         .stderr
         .take()
@@ -145,18 +163,19 @@ pub async fn cmd_install_grok_cli(
         let code = status.code().unwrap_or(-1);
         return Err(format!(
             "Grok CLI installer exited with error code {code}. \
-             Try running manually: curl -fsSL {INSTALL_SCRIPT_URL} | bash"
+             Try running the official installer script manually."
         ));
     }
 
     emit_progress(&app_handle, "verifying", 0, 0, 90, "Verifying installation…");
 
-    // Find the installed binary (install.sh puts it in ~/.grok/bin/grok)
+    // Find the installed binary (install.sh puts it in ~/.grok/bin/grok, install.ps1 puts it in ~/.grok/bin/grok.exe)
+    let bin_name = if cfg!(target_os = "windows") { "grok.exe" } else { "grok" };
     let grok_bin = dirs::home_dir()
         .ok_or("Cannot find home directory")?
         .join(".grok")
         .join("bin")
-        .join("grok");
+        .join(bin_name);
 
     // Fallback: search PATH
     let grok_path = if grok_bin.exists() {

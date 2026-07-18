@@ -80,14 +80,25 @@ pub fn resolve_grok_binary(settings: &Settings) -> Result<String> {
     }
 
     // Fallback: check well-known install locations from the official installer
-    // (curl -fsSL https://x.ai/cli/install.sh | bash → installs to ~/.grok/bin/grok)
-    let home = home_dir().unwrap_or_else(|| PathBuf::from("/root"));
-    for candidate in &[
-        home.join(".grok").join("bin").join("grok"),
-        home.join(".local").join("bin").join("grok"),
-        PathBuf::from("/usr/local/bin/grok"),
-        PathBuf::from("/usr/bin/grok"),
-    ] {
+    let home = home_dir().unwrap_or_else(|| {
+        if cfg!(target_os = "windows") {
+            PathBuf::from("C:\\")
+        } else {
+            PathBuf::from("/root")
+        }
+    });
+    let bin_name = if cfg!(target_os = "windows") { "grok.exe" } else { "grok" };
+    
+    let mut candidates = vec![
+        home.join(".grok").join("bin").join(bin_name),
+        home.join(".local").join("bin").join(bin_name),
+    ];
+    if !cfg!(target_os = "windows") {
+        candidates.push(PathBuf::from("/usr/local/bin/grok"));
+        candidates.push(PathBuf::from("/usr/bin/grok"));
+    }
+
+    for candidate in candidates {
         if candidate.exists() {
             return Ok(candidate.to_string_lossy().to_string());
         }

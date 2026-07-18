@@ -1,7 +1,7 @@
 import { BookOpen, MessageCircleMore, Settings } from 'lucide-react';
 
 const DOCS_URL = 'https://docs.x.ai/build/overview';
-const FEEDBACK_URL = 'https://github.com/xai-org/grok-build/issues';
+const FEEDBACK_URL = 'https://github.com/spacy2804/grokdeck/issues';
 
 async function openLink(url: string) {
   try {

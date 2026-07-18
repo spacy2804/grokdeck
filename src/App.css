@@ -2292,7 +2292,7 @@ body {
 .ow-status-dot-single {
   width: 6px; height: 6px; border-radius: 50%;
 }
-.ow-status-dot-single.idle    { background: var(--slate-7); }
+.ow-status-dot-single.idle    { background: var(--green-9); }
 .ow-status-dot-single.running { background: var(--blue-9); }
 .ow-status-dot-single.error   { background: var(--red-9); }
 
