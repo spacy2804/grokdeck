@@ -1,0 +1,8 @@
+[Desktop Entry]
+Categories=Development;Utility;
+Comment=Desktop GUI for Grok CLI
+Exec=grokdeck
+Icon=grokdeck
+Name=Grok Deck
+Terminal=false
+Type=Application

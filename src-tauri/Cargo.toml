@@ -1,0 +1,33 @@
+[package]
+name = "grokdeck"
+version = "0.1.0"
+description = "Grok Deck — Desktop GUI for Grok Build"
+authors = ["SpaceXAI"]
+edition = "2021"
+
+# Opt out of the parent grok-build Cargo workspace
+[workspace]
+
+[lib]
+name = "grokdeck_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+anyhow = "1"
+uuid = { version = "1", features = ["v4"] }
+dirs = "5"
+which = "7"
+base64 = "0.22"
+reqwest = { version = "0.12", features = ["stream"] }
+futures-util = "0.3"
+sha2 = "0.10"
