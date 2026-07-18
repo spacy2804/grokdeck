@@ -188,4 +188,4 @@ Detected artifacts appear as clickable pills below the assistant message. Clicki
 
 ## License
 
-Private — all rights reserved.
+[MIT](./LICENSE) © 2026 spacy2804
